@@ -60,26 +60,43 @@ isolated from the main site packages directory. Install it from your package man
 Ubuntu:
 
 ```
-sudo apt-get install virtualenv
+sudo apt-get install python-virtualenv
+```
+
+There are a few more dependencies required for running pybombs:
+
+```
+sudo apt-get install python-dev python-pip python-yaml python-apt python-setuptools usbutils screen git-core
 ```
 
 Once that is done, create a directory, and have `virtualenv` create a new environemnt for
-you:
+you. After that, you can `cd` into your new environment, and activate it:
 ```
-mkdir ~/sandbox
-virtualenv ~/sandbox/gr
-```
-Then cd into your new environment, and activate it:
-```
-cd ~/sandbox/gr
+mkdir ~/gr-sandbox
+virtualenv ~/gr-sandbox
+cd ~/gr-sandbox
 source bin/activate
 ```
 Notice how the prompt changes to show the active environment.
 
-Now you can install pybombs:
+NOw that you have a sandbox to play in, you can install pybombs, set the sandbox as your prefix 
+and load the recipes. Note that the order of adding the recipes is important, as this allows 
+recipes from this repository to override the default ones:
+
 ```
 pip install pybombs
+pybombs prefix init `pwd`
+pybombs recipes add p4g-recipes git+https://github.com/phase4ground/p4g-recipes
+pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-etcetera.git
+pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
 ```
 
+If you now run `pybombs recipes list`, you should (after a while) see the list of recipes 
+that a `pybombs install` will select. Note that some of the recipes come from this repository
+(p4g-recipes). These are the ones that we are overriding to select specific versions.
 
-Build this by running `build.sh` from the command line.
+You can now try and install some specific versions. There is a script `build.sh` that
+can give you some starting points.
+
+Good luck!
+
