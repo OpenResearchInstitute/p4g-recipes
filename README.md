@@ -47,10 +47,39 @@ there will be many different OS libraries that the code will link against, and c
 will be different versions also. This effort is about 
 locking down the versions just enough, so that the differences are no longer a problem.
 
-## How to build something useful
+## How to bootstrap this
 We are just starting to do this, so there are no official "known good" versions yet. Bear with us
 while we are spinning this up. So far, the list of recipes is rather short. The first order of the
 day is to build something reasonably stable that works with the ADALM-PLUTO. Take a look at the
 lwr files to see which version is selected for each of the components included.
 
-Build instructions are forthcoming.
+First you want to set up a sandbox to play in, so you don't have to modify the Python installation
+on your system (if something goes wrong there, it can be hard to recover from). Luckily there
+is a tool to help with that, called `virtualenv`. It lets you create a Python environemnt that is 
+isolated from the main site packages directory. Install it from your package manager, e.g. on
+Ubuntu:
+
+```
+sudo apt-get install virtualenv
+```
+
+Once that is done, create a directory, and have `virtualenv` create a new environemnt for
+you:
+```
+mkdir ~/sandbox
+virtualenv ~/sandbox/gr
+```
+Then cd into your new environment, and activate it:
+```
+cd ~/sandbox/gr
+source bin/activate
+```
+Notice how the prompt changes to show the active environment.
+
+Now you can install pybombs:
+```
+pip install pybombs
+```
+
+
+Build this by running `build.sh` from the command line.
