@@ -1,0 +1,64 @@
+# Derive from Ubuntu
+FROM ubuntu:14.04
+
+# Set prefix variables
+ENV TheUser amsat
+ENV TheHomeDir /opt
+ENV PyBOMBS_prefix myprefix
+ENV PyBOMBS_init ${TheHomeDir}/pybombs
+
+# Update apt-get
+RUN apt-get update
+
+# Install PyBOMBS dependencies
+RUN apt-get install -y \
+        python-dev \
+        python-pip \
+        python-yaml \
+        python-apt \
+        python-setuptools \
+        usbutils \
+        screen \
+        git-core
+
+# Install PyBOMBS
+RUN pip install PyBOMBS
+
+# Create user amsat, and enable sudo
+RUN groupadd -r ${TheUser} && useradd -m -r -g ${TheUser} ${TheUser} && usermod -aG sudo ${TheUser}
+RUN echo ${TheUser}' ALL=(ALL) NOPASSWD:ALL' >> /etc/sudoers
+WORKDIR ${TheHomeDir}
+
+# Add recipes to PyBOMBS
+RUN pybombs recipes add p4g-recipes git+https://github.com/phase4ground/p4g-recipes
+RUN pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-etcetera.git
+RUN pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
+
+# Setup environment
+RUN pybombs prefix init ${PyBOMBS_init} -a ${PyBOMBS_prefix}
+RUN echo "source "${PyBOMBS_init}"/setup_env.sh" >> .bashrc
+RUN pybombs -p ${PyBOMBS_prefix} install "uhd" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install "libiio" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install "gr-iio" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install "gr-osmosdr" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install "limesuite" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install "rtl-sdr" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install --deps-only "gnuradio" && rm -rf ${PyBOMBS_init}/src/*
+RUN pybombs -p ${PyBOMBS_prefix} install --no-deps "gnuradio" && rm -rf ${PyBOMBS_init}/src/*
+RUN ldconfig ${PyBOMBS_init}/lib ${PyBOMBS_init}/lib/x86_64-linux-gnu
+
+# Install LXDE and VNC server
+# RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lxde-core lxterminal tightvncserver
+
+# Expose ports.
+# EXPOSE 5901
+
+# Change directory ownwership
+RUN chown ${TheUser}:${TheUser} ${PyBOMBS_init}
+
+# Switch user
+USER ${TheUser}
+
+# Start VNC server
+# CMD vncserver :1 -geometry 1280x1024 -depth 24 && tail -F /root/.vnc/*.log
+
