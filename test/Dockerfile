@@ -1,28 +1,27 @@
 # Derive from Ubuntu
-FROM ubuntu:14.04
+FROM debian:9.1
 
 # Set prefix variables
 ENV TheUser amsat
 ENV TheHomeDir /home/${TheUser}
-# Where we are going to install
-ENV P4G_Path ${TheHomeDir}/p4g
 # Alias (shorthand) for P4G_Path
 ENV P4G p4g
+# Where we are going to install
+ENV P4G_Path ${TheHomeDir}/${P4G}
 
-# Update apt and install requirements for pybombs, and other essentials
-RUN apt-get update; apt-get install -y --no-install-recommends apt-utils 
-RUN apt-get install -y --no-install-recommends \
-        sudo \
-        vim \
-        xterm \ 
-        screen \
-        python-dev \
-        python-pip \
-        python-yaml \
-        python-apt \
-        python-setuptools \
-        usbutils \
-        git-core
+# Update apt database, install prerequisites for pybombs, and some tools
+RUN apt-get update 
+# FIXME - the update and install need to be in the same statement for production use.
+RUN apt-get install -y --no-install-recommends  \
+        # For pybombs
+        apt-utils python-pip python-apt python-setuptools \
+        # System management
+        sudo vim xterm screen 
+        # No longer needed:
+        # python-dev \
+        # python-yaml \
+        # usbutils \
+        # git-core
 
 # Create user amsat, and enable sudo
 RUN groupadd -r ${TheUser} && useradd -m -r -g ${TheUser} ${TheUser} && usermod -aG sudo ${TheUser}
@@ -32,11 +31,14 @@ WORKDIR ${TheHomeDir}
 # Switch user
 USER ${TheUser}
 
-RUN sudo pip install --upgrade pip
+# Update pip to the latest version
+RUN sudo -H pip install --upgrade pip
+# RUN sudo -H pip install urllib3[secure] --upgrade
 
 # Install PyBOMBS
-RUN sudo pip install PyBOMBS
+RUN sudo -H pip install PyBOMBS
 
+# Create pybombs prefix and add its environment to bash startup script
 RUN pybombs prefix init ${P4G_Path} -a ${P4G}
 RUN echo "source "${P4G_Path}"/setup_env.sh" >> .bashrc
 
@@ -45,22 +47,15 @@ RUN pybombs recipes add p4g-recipes git+https://github.com/phase4ground/p4g-reci
 RUN pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-etcetera.git
 RUN pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
 
-# Setup environment
-RUN sudo pybombs -p ${P4G} install "uhd" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install "libiio" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install "gr-iio" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install "gr-osmosdr" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install "limesuite" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install "rtl-sdr" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install --deps-only "gnuradio" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo pybombs -p ${P4G} install --no-deps "gnuradio" && sudo rm -rf ${P4G_Path}/src/*
-RUN sudo ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu
+# Finally: Run pybombs, then update the system's shared library registry
+RUN sudo -H pybombs -p ${P4G} install gr-iio gr-osmosdr limesuite 
+# RUN sudo ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu
 
 # Install LXDE and VNC server
-RUN DEBIAN_FRONTEND=noninteractive apt-get install -y lxde-core lxterminal tightvncserver
+# RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y lxde-core lxterminal tightvncserver
 
 # Expose ports.
-EXPOSE 5901
+# EXPOSE 5901
 
 # Start VNC server
-CMD vncserver :1 -geometry 1280x1024 -depth 24 && tail -F /root/.vnc/*.log
+# CMD vncserver :1 -geometry 1440x900 -depth 24 && tail -F /root/.vnc/*.log
