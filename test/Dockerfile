@@ -1,5 +1,5 @@
 # Derive from Ubuntu
-FROM debian:9.1
+FROM ubuntu:16.04
 
 # Set prefix variables
 ENV TheUser amsat
@@ -39,13 +39,13 @@ RUN sudo -H pip install --upgrade pip
 RUN sudo -H pip install PyBOMBS
 
 # Create pybombs prefix and add its environment to bash startup script
-RUN pybombs prefix init ${P4G_Path} -a ${P4G}
+RUN sudo -H pybombs prefix init ${P4G_Path} -a ${P4G}
 RUN echo "source "${P4G_Path}"/setup_env.sh" >> .bashrc
 
 # Add recipes to PyBOMBS
-RUN pybombs recipes add p4g-recipes git+https://github.com/phase4ground/p4g-recipes
-RUN pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-etcetera.git
-RUN pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
+RUN sudo -H pybombs recipes add p4g-recipes git+https://github.com/phase4ground/p4g-recipes
+RUN sudo -H pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-etcetera.git
+RUN sudo -H pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
 
 # Finally: Run pybombs, then update the system's shared library registry
 RUN sudo -H pybombs -p ${P4G} install gr-iio gr-osmosdr limesuite 
