@@ -16,12 +16,7 @@ RUN apt-get install -y --no-install-recommends  \
         # For pybombs
         apt-utils python-pip python-apt python-setuptools \
         # System management
-        sudo vim xterm screen 
-        # No longer needed:
-        # python-dev \
-        # python-yaml \
-        # usbutils \
-        # git-core
+        sudo vim xterm screen usbutils git-core
 
 # Create user amsat, and enable sudo
 RUN groupadd -r ${TheUser} && useradd -m -r -g ${TheUser} ${TheUser} && usermod -aG sudo ${TheUser}
@@ -48,8 +43,10 @@ RUN sudo -H pybombs recipes add gr-etcetera git+https://github.com/gnuradio/gr-e
 RUN sudo -H pybombs recipes add gr-recipes git+https://github.com/gnuradio/gr-recipes.git
 
 # Finally: Run pybombs, then update the system's shared library registry
-RUN sudo -H pybombs -p ${P4G} install gr-iio gr-osmosdr limesuite 
-# RUN sudo ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu
+RUN sudo -H pybombs -p ${P4G} install gr-iio && sudo -H rm -rf ${P4G_Path}/src/*
+RUN sudo -H pybombs -p ${P4G} install gr-osmosdr && sudo -H rm -rf ${P4G_Path}/src/*
+RUN sudo -H pybombs -p ${P4G} install limesuite && sudo -H rm -rf ${P4G_Path}/src/*
+RUN sudo -H ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu
 
 # Install LXDE and VNC server
 # RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y lxde-core lxterminal tightvncserver
