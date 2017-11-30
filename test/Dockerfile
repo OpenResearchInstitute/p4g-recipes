@@ -10,13 +10,17 @@ ENV P4G p4g
 ENV P4G_Path ${TheHomeDir}/${P4G}
 
 # Update apt database, install prerequisites for pybombs, and some tools
-RUN apt-get update 
+RUN apt-get update
+# Checkme
+RUN apt-get -y upgrade
 # FIXME - the update and install need to be in the same statement for production use.
 RUN apt-get install -y --no-install-recommends  \
         # For pybombs
         apt-utils python-pip python-apt python-setuptools \
         # System management
-        sudo vim xterm screen usbutils git-core
+        sudo vim xterm screen usbutils git-core \
+        # experimental
+        lxde-core lxterminal tightvncserver
 
 # Create user amsat, and enable sudo
 RUN groupadd -r ${TheUser} && useradd -m -r -g ${TheUser} ${TheUser} && usermod -aG sudo ${TheUser}
@@ -52,7 +56,7 @@ RUN sudo -H ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu
 # RUN DEBIAN_FRONTEND=noninteractive sudo apt-get install -y lxde-core lxterminal tightvncserver
 
 # Expose ports.
-# EXPOSE 5901
+EXPOSE 5901
 
 # Start VNC server
-# CMD vncserver :1 -geometry 1440x900 -depth 24 && tail -F /root/.vnc/*.log
+CMD vncserver :1 -geometry 1440x900 -depth 24 && tail -F /root/.vnc/*.log
