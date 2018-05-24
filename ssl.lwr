@@ -19,7 +19,7 @@
 
 category: baseline
 satisfy:
-  deb: libssl1.0-dev
+  deb: libssl1.1-dev
   rpm: openssl-devel || libopenssl-devel
   pacman: openssl
   port: openssl
