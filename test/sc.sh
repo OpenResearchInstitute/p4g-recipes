@@ -1,4 +1,4 @@
 #!/bin/bash
 
-docker run -it --rm --privileged -p 5901:5901 -e USER=amsat -v ~/Docker:/home/amsat/Docker p4g:0.7 /bin/bash
+docker run -it --rm --privileged -e USER=amsat -v ~/Docker:/home/amsat/Docker molino-gnuradio:0.1 /bin/bash
 
