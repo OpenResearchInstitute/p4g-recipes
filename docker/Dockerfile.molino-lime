@@ -1,0 +1,5 @@
+FROM molino-gnuradio:0.1
+
+# add limesuite, then update the system's shared library registry
+RUN .local/bin/pybombs -p ${P4G} install limesuite && rm -rf ${P4G_Path}/src/*
+RUN sudo -H ldconfig ${P4G_Path}/lib ${P4G_Path}/lib/x86_64-linux-gnu

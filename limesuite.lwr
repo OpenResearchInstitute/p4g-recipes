@@ -23,9 +23,8 @@ depends:
 - libusb
 - sqlite
 description: Lime suite device drivers, GUI, and SDR support
-gitbranch: master
 inherit: cmake
-# Let's always build this from source, not binaries
+gitrev: tags/v18.04.1
 source: git+git://github.com/myriadrf/LimeSuite.git
 vars:
   config_opt: " -DENABLE_GUI=OFF -DENABLE_SOAPY_LMS7=ON -DENABLE_STREAM=ON "
