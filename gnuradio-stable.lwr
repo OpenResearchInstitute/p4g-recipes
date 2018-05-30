@@ -28,8 +28,6 @@ config:
       optional: True
     gnuradio:
       gitbranch: maint-3.7
-    uhd:
-      optional: True
     gqrx:
       forcebuild: True
 
