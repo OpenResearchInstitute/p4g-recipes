@@ -17,15 +17,14 @@
 # Boston, MA 02110-1301, USA.
 #
 
-category: common
+category: baseline
 depends:
-- gnuradio
-- libiio
-- libad9361
-- flex
-- bison
-description: GNU Radio IIO Blocks
-# gitrev: tags/v0.2
+- soapysdr
+- libusb
+- sqlite
+description: Lime suite device drivers, GUI, and SDR support
 inherit: cmake
-# Let's always build this from source, not binaries
-source: git+https://github.com/analogdevicesinc/gr-iio.git
+gitrev: tags/v18.10
+source: git+git://github.com/myriadrf/LimeSuite.git
+vars:
+  config_opt: " -DENABLE_GUI=OFF -DENABLE_SOAPY_LMS7=ON -DENABLE_STREAM=ON "
