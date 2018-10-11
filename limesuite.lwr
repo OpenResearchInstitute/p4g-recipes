@@ -24,7 +24,7 @@ depends:
 - sqlite
 description: Lime suite device drivers, GUI, and SDR support
 inherit: cmake
-gitrev: tags/v18.04.1
+gitrev: tags/v18.10
 source: git+git://github.com/myriadrf/LimeSuite.git
 vars:
   config_opt: " -DENABLE_GUI=OFF -DENABLE_SOAPY_LMS7=ON -DENABLE_STREAM=ON "
